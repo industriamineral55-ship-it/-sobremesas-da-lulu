@@ -128,7 +128,6 @@
     // =================================================================
     const adminPassword = 'lulu';
     const luluWhatsAppNumber = '558199605432';
-    const productsFilePath = 'products.json';
 
     // =================================================================
     // VARIÁVEIS GLOBAIS
@@ -188,8 +187,8 @@
     // =================================================================
     async function fetchProducts() {
         try {
-            const response = await fetch(productsFilePath + '?t=' + new Date().getTime());
-            if (!response.ok) throw new Error('Arquivo products.json não encontrado.');
+            const response = await fetch('/api/products');
+            if (!response.ok) throw new Error('Não foi possível carregar os produtos.');
             allProducts = await response.json();
         } catch (error) {
             console.error('Erro ao buscar produtos:', error);

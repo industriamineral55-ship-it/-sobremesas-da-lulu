@@ -109,7 +109,6 @@
             // CONFIGURAÇÕES DA LOJA
             // =================================================================
             const luluWhatsAppNumber = '558199605432'; // Ex: 5511999998888 (código do país + DDD + número)
-            const productsFilePath = 'products.json';
 
             // =================================================================
             // VARIÁVEIS GLOBAIS
@@ -131,7 +130,7 @@
 
             async function fetchProducts() {
                 try {
-                    const response = await fetch(productsFilePath);
+                    const response = await fetch('/api/products');
                     if (!response.ok) {
                         throw new Error('Não foi possível carregar os produtos.');
                     }
