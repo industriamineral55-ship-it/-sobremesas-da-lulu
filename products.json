@@ -1,0 +1,45 @@
+
+[
+    { 
+        "id": 1, 
+        "name": "Bolo de Pote (Chocolate)", 
+        "description": "Massa fofinha de chocolate com recheio cremoso de brigadeiro.", 
+        "price": 12.00, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Bolo+de+Pote" 
+    },
+    { 
+        "id": 2, 
+        "name": "Pudim de Leite Condensado", 
+        "description": "Pudim lisinho e cremoso com uma calda de caramelo perfeita.", 
+        "price": 8.00, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Pudim" 
+    },
+    { 
+        "id": 3, 
+        "name": "Mousse de Maracujá", 
+        "description": "A combinação perfeita do azedinho do maracujá com a doçura do creme.", 
+        "price": 10.00, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Mousse" 
+    },
+    { 
+        "id": 4, 
+        "name": "Torta de Limão", 
+        "description": "Base crocante, recheio de limão e cobertura de merengue suíço.", 
+        "price": 15.00, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Torta+de+Limão" 
+    },
+    { 
+        "id": 5, 
+        "name": "Brigadeiro Gourmet (Unidade)", 
+        "description": "O clássico que todo mundo ama, feito com chocolate nobre.", 
+        "price": 3.50, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Brigadeiro" 
+    },
+    { 
+        "id": 6, 
+        "name": "Brownie com Nozes", 
+        "description": "Casquinha crocante por fora, super macio por dentro e com pedaços de nozes.", 
+        "price": 9.00, 
+        "image": "https://placehold.co/600x400/FFB6C1/333?text=Brownie" 
+    }
+]

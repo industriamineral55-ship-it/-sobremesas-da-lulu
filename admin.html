@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sobremesas da Lulu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFF7F9;
+        }
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+        #admin-content.hidden {
+            display: none;
+        }
+        #login-modal.hidden {
+            display: none;
+        }
+        .product-card-admin {
+            position: relative;
+        }
+        .admin-buttons {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold mb-4 text-pink-800">Acesso Restrito</h2>
+            <p class="text-gray-600 mb-4">Digite a senha para gerenciar a loja.</p>
+            <input type="password" id="password-input" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500" placeholder="Senha">
+            <button id="login-btn" class="w-full bg-pink-500 text-white py-2 rounded-lg font-bold mt-4 hover:bg-pink-600 transition-colors">Entrar</button>
+            <p id="login-error" class="text-red-500 mt-2 h-4"></p>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="admin-content" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-md py-4">
+            <div class="container mx-auto text-center px-4">
+                <h1 class="font-pacifico text-4xl text-pink-500">Sobremesas da Lulu!</h1>
+                <p class="text-gray-500 mt-1">Modo de Administração</p>
+            </div>
+        </header>
+
+        <!-- Controls -->
+        <div class="container mx-auto p-4 flex justify-between items-center">
+            <button id="add-product-btn" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Adicionar Novo Produto</button>
+            <button id="save-changes-btn" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Salvar Alterações</button>
+        </div>
+
+        <!-- Product Grid -->
+        <main class="container mx-auto p-4 md:p-8">
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Os produtos serão inseridos aqui -->
+            </div>
+        </main>
+
+        <!-- Product Edit Modal -->
+        <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-screen overflow-hidden flex flex-col">
+                <div class="p-6 border-b">
+                    <h3 id="edit-modal-title" class="text-2xl font-bold text-pink-800">Editar Produto</h3>
+                </div>
+                <div class="p-6 overflow-y-auto">
+                    <input type="hidden" id="product-id-input">
+                    <div class="mb-4">
+                        <label for="product-name-input" class="block text-sm font-medium text-gray-700">Nome</label>
+                        <input type="text" id="product-name-input" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="product-desc-input" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <textarea id="product-desc-input" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="product-price-input" class="block text-sm font-medium text-gray-700">Preço (R$)</label>
+                        <input type="number" id="product-price-input" step="0.01" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Imagem do Produto</label>
+                        <div id="image-drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <img id="image-preview" src="" class="hidden mx-auto h-24 w-auto mb-4">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-pink-600 hover:text-pink-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500">
+                                        <span>Carregue um arquivo</span>
+                                        <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">ou arraste e solte</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF até 10MB</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="product-image-path">
+                    </div>
+                </div>
+                <div class="p-6 border-t bg-gray-50 flex justify-end gap-4">
+                    <button id="cancel-edit-btn" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">Cancelar</button>
+                    <button id="save-product-btn" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    // =================================================================
+    // CONFIGURAÇÕES
+    // =================================================================
+    const adminPassword = 'lulu';
+    const luluWhatsAppNumber = '558199605432';
+    const productsFilePath = 'products.json';
+
+    // =================================================================
+    // VARIÁVEIS GLOBAIS
+    // =================================================================
+    let allProducts = [];
+    
+    const loginModal = document.getElementById('login-modal');
+    const loginBtn = document.getElementById('login-btn');
+    const passwordInput = document.getElementById('password-input');
+    const loginError = document.getElementById('login-error');
+    const adminContent = document.getElementById('admin-content');
+    
+    const productGrid = document.getElementById('product-grid');
+    const addProductBtn = document.getElementById('add-product-btn');
+    const saveChangesBtn = document.getElementById('save-changes-btn');
+    
+    const editModal = document.getElementById('edit-modal');
+    const editModalTitle = document.getElementById('edit-modal-title');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const saveProductBtn = document.getElementById('save-product-btn');
+    
+    const productIdInput = document.getElementById('product-id-input');
+    const productNameInput = document.getElementById('product-name-input');
+    const productDescInput = document.getElementById('product-desc-input');
+    const productPriceInput = document.getElementById('product-price-input');
+    
+    // Image Upload Elements
+    const imageDropZone = document.getElementById('image-drop-zone');
+    const imagePreview = document.getElementById('image-preview');
+    const fileUploadInput = document.getElementById('file-upload');
+    const productImagePathInput = document.getElementById('product-image-path');
+
+
+    // =================================================================
+    // FUNÇÕES DE LOGIN
+    // =================================================================
+    function handleLogin() {
+        if (passwordInput.value === adminPassword) {
+            loginModal.classList.add('hidden');
+            adminContent.classList.remove('hidden');
+            initAdmin();
+        } else {
+            loginError.textContent = 'Senha incorreta.';
+            passwordInput.value = '';
+        }
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    passwordInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    });
+
+    // =================================================================
+    // FUNÇÕES DE DADOS (FETCH & SAVE)
+    // =================================================================
+    async function fetchProducts() {
+        try {
+            const response = await fetch(productsFilePath + '?t=' + new Date().getTime());
+            if (!response.ok) throw new Error('Arquivo products.json não encontrado.');
+            allProducts = await response.json();
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+            alert('Erro ao carregar produtos.');
+        }
+    }
+
+    async function saveProductsToFile() {
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(allProducts),
+            });
+            if (!response.ok) throw new Error('Falha ao salvar os produtos.');
+            const responseText = await response.text();
+            alert(responseText);
+        } catch (error) {
+            console.error('Erro ao salvar produtos:', error);
+            alert('Ocorreu um erro ao tentar salvar os produtos.');
+        }
+    }
+
+    // =================================================================
+    // FUNÇÕES DE UPLOAD DE IMAGEM
+    // =================================================================
+    async function handleImageUpload(file) {
+        const formData = new FormData();
+        formData.append('productImage', file);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) throw new Error('Falha no upload da imagem.');
+            
+            const result = await response.json();
+            productImagePathInput.value = result.filePath;
+            imagePreview.src = result.filePath;
+            imagePreview.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Erro no upload:', error);
+            alert('Erro ao enviar a imagem.');
+        }
+    }
+
+    // Event listeners para Drag and Drop
+    imageDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        imageDropZone.classList.add('border-pink-500');
+    });
+    imageDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        imageDropZone.classList.remove('border-pink-500');
+    });
+    imageDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        imageDropZone.classList.remove('border-pink-500');
+        const file = e.dataTransfer.files[0];
+        if (file) handleImageUpload(file);
+    });
+    fileUploadInput.addEventListener('change', () => {
+        const file = fileUploadInput.files[0];
+        if (file) handleImageUpload(file);
+    });
+
+
+    // =================================================================
+    // FUNÇÕES DE RENDERIZAÇÃO E UI
+    // =================================================================
+    function renderAdminProducts() {
+        productGrid.innerHTML = '';
+        allProducts.forEach(product => {
+            const productCard = `
+                <div class="product-card-admin bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-pink-900">${product.name}</h3>
+                        <p class="text-gray-600 mt-2 h-16 overflow-hidden">${product.description}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-lg font-bold text-pink-500">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    </div>
+                    <div class="admin-buttons">
+                        <button data-id="${product.id}" class="edit-btn bg-yellow-400 text-white p-2 rounded-full shadow-lg hover:bg-yellow-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button data-id="${product.id}" class="delete-btn bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            productGrid.innerHTML += productCard;
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEditProduct));
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteProduct));
+    }
+
+    function openEditModal(product) {
+        // Reset image preview
+        imagePreview.classList.add('hidden');
+        imagePreview.src = '';
+        productImagePathInput.value = '';
+
+        if (product) {
+            editModalTitle.textContent = 'Editar Produto';
+            productIdInput.value = product.id;
+            productNameInput.value = product.name;
+            productDescInput.value = product.description;
+            productPriceInput.value = product.price;
+            // Handle image
+            productImagePathInput.value = product.image;
+            if (product.image) {
+                imagePreview.src = product.image;
+                imagePreview.classList.remove('hidden');
+            }
+        } else {
+            editModalTitle.textContent = 'Adicionar Novo Produto';
+            productIdInput.value = '';
+            productNameInput.value = '';
+            productDescInput.value = '';
+            productPriceInput.value = '';
+        }
+        editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        editModal.classList.add('hidden');
+    }
+
+    // =================================================================
+    // FUNÇÕES CRUD
+    // =================================================================
+    function handleAddProduct() {
+        openEditModal(null);
+    }
+
+    function handleEditProduct(event) {
+        const id = parseInt(event.currentTarget.dataset.id);
+        const product = allProducts.find(p => p.id === id);
+        openEditModal(product);
+    }
+
+    function handleDeleteProduct(event) {
+        if (!confirm('Tem certeza que deseja remover este produto?')) return;
+        const id = parseInt(event.currentTarget.dataset.id);
+        allProducts = allProducts.filter(p => p.id !== id);
+        renderAdminProducts();
+    }
+
+    function handleSaveProduct() {
+        const id = parseInt(productIdInput.value);
+        const name = productNameInput.value.trim();
+        const description = productDescInput.value.trim();
+        const price = parseFloat(productPriceInput.value);
+        const image = productImagePathInput.value; // Get path from hidden input
+
+        if (!name || !description || isNaN(price) || !image) {
+            alert('Por favor, preencha todos os campos, incluindo a imagem.');
+            return;
+        }
+
+        if (id) {
+            const productIndex = allProducts.findIndex(p => p.id === id);
+            if (productIndex > -1) {
+                allProducts[productIndex] = { id, name, description, price, image };
+            }
+        } else {
+            const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
+            allProducts.push({ id: newId, name, description, price, image });
+        }
+
+        renderAdminProducts();
+        closeEditModal();
+    }
+
+    // =================================================================
+    // INICIALIZAÇÃO
+    // =================================================================
+    async function initAdmin() {
+        await fetchProducts();
+        renderAdminProducts();
+
+        addProductBtn.addEventListener('click', handleAddProduct);
+        saveChangesBtn.addEventListener('click', saveProductsToFile);
+        cancelEditBtn.addEventListener('click', closeEditModal);
+        saveProductBtn.addEventListener('click', handleSaveProduct);
+    }
+});
+    </script>
+
+</body>
+</html>
