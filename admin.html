@@ -224,14 +224,21 @@
                 method: 'POST',
                 body: formData,
             });
-            const data = await response.json();
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                console.error('Server error:', responseData);
+                throw new Error(responseData.message || 'Falha no upload da imagem.');
+            }
             
-            // Display the environment variable keys from the server for debugging
-            alert(data.message + '\n\n' + JSON.stringify(data.keys, null, 2));
+            productImagePathInput.value = responseData.filePath;
+            imagePreview.src = responseData.filePath;
+            imagePreview.classList.remove('hidden');
 
         } catch (error) {
             console.error('Erro no upload:', error);
-            alert(`Um erro ocorreu ao tentar comunicar com o servidor: ${error.message}`);
+            alert(`Erro ao enviar a imagem: ${error.message}`);
         }
     }
 
