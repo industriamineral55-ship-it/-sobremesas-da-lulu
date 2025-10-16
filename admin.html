@@ -224,16 +224,21 @@
                 method: 'POST',
                 body: formData,
             });
-            if (!response.ok) throw new Error('Falha no upload da imagem.');
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                console.error('Server error:', responseData);
+                throw new Error(responseData.message || 'Falha no upload da imagem.');
+            }
             
-            const result = await response.json();
-            productImagePathInput.value = result.filePath;
-            imagePreview.src = result.filePath;
+            productImagePathInput.value = responseData.filePath;
+            imagePreview.src = responseData.filePath;
             imagePreview.classList.remove('hidden');
 
         } catch (error) {
             console.error('Erro no upload:', error);
-            alert('Erro ao enviar a imagem.');
+            alert(`Erro ao enviar a imagem: ${error.message}`);
         }
     }
 
