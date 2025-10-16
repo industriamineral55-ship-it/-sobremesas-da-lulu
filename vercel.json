@@ -1,11 +1,15 @@
+
 {
   "version": 2,
   "installCommand": "npm install",
   "builds": [
-    { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" }
+    { "src": "api/products.js", "use": "@vercel/node" },
+    { "src": "api/upload.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/index.html", "dest": "/index.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
+    { "src": "/api/products", "dest": "/api/products.js" },
+    { "src": "/api/upload", "dest": "/api/upload.js" }
   ]
 }
