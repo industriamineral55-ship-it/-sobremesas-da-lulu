@@ -26,9 +26,16 @@ async function seed() {
     // Read the local products.json file
     const filePath = path.join(process.cwd(), 'products.json');
     const fileContent = await fs.readFile(filePath, 'utf-8');
-    const products = JSON.parse(fileContent);
+    let products = JSON.parse(fileContent);
+
+    // Add the inStock property to each product, defaulting to true
+    products = products.map(product => ({
+      ...product,
+      inStock: product.inStock !== undefined ? product.inStock : true,
+    }));
 
     console.log(`Encontrados ${products.length} produtos no products.json.`);
+    console.log('Atualizando a propriedade "inStock" em cada produto...');
     console.log('Enviando para o banco de dados...');
 
     // Save the products to the KV store under the key 'products'

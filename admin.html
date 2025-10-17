@@ -91,6 +91,10 @@
                         <label for="product-price-input" class="block text-sm font-medium text-gray-700">Preço (R$)</label>
                         <input type="number" id="product-price-input" step="0.01" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500">
                     </div>
+                    <div class="mb-4 flex items-center">
+                        <input id="product-stock-input" type="checkbox" class="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+                        <label for="product-stock-input" class="ml-3 block text-sm font-medium text-gray-900">Em estoque</label>
+                    </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Imagem do Produto</label>
                         <div id="image-drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
@@ -153,6 +157,7 @@
     const productNameInput = document.getElementById('product-name-input');
     const productDescInput = document.getElementById('product-desc-input');
     const productPriceInput = document.getElementById('product-price-input');
+    const productStockInput = document.getElementById('product-stock-input');
     
     // Image Upload Elements
     const imageDropZone = document.getElementById('image-drop-zone');
@@ -269,14 +274,16 @@
     function renderAdminProducts() {
         productGrid.innerHTML = '';
         allProducts.forEach(product => {
+            const stockClass = product.inStock ? 'border-green-500' : 'border-red-500';
             const productCard = `
-                <div class="product-card-admin bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="product-card-admin bg-white rounded-lg shadow-md overflow-hidden border-2 ${stockClass}">
                     <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
                     <div class="p-4">
                         <h3 class="text-xl font-bold text-pink-900">${product.name}</h3>
                         <p class="text-gray-600 mt-2 h-16 overflow-hidden">${product.description}</p>
                         <div class="flex justify-between items-center mt-4">
                             <span class="text-lg font-bold text-pink-500">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
+                            <span class="text-sm font-bold ${product.inStock ? 'text-green-600' : 'text-red-600'}">${product.inStock ? 'Em Estoque' : 'Esgotado'}</span>
                         </div>
                     </div>
                     <div class="admin-buttons">
@@ -308,7 +315,7 @@
             productNameInput.value = product.name;
             productDescInput.value = product.description;
             productPriceInput.value = product.price;
-            // Handle image
+            productStockInput.checked = product.inStock;
             productImagePathInput.value = product.image;
             if (product.image) {
                 imagePreview.src = product.image;
@@ -320,6 +327,7 @@
             productNameInput.value = '';
             productDescInput.value = '';
             productPriceInput.value = '';
+            productStockInput.checked = true; // Default to in stock
         }
         editModal.classList.remove('hidden');
     }
@@ -354,20 +362,24 @@
         const description = productDescInput.value.trim();
         const price = parseFloat(productPriceInput.value);
         const image = productImagePathInput.value; // Get path from hidden input
+        const inStock = productStockInput.checked;
 
         if (!name || !description || isNaN(price) || !image) {
             alert('Por favor, preencha todos os campos, incluindo a imagem.');
             return;
         }
 
+        const productData = { id, name, description, price, image, inStock };
+
         if (id) {
             const productIndex = allProducts.findIndex(p => p.id === id);
             if (productIndex > -1) {
-                allProducts[productIndex] = { id, name, description, price, image };
+                allProducts[productIndex] = productData;
             }
         } else {
             const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
-            allProducts.push({ id: newId, name, description, price, image });
+            productData.id = newId;
+            allProducts.push(productData);
         }
 
         renderAdminProducts();
@@ -386,6 +398,8 @@
         cancelEditBtn.addEventListener('click', closeEditModal);
         saveProductBtn.addEventListener('click', handleSaveProduct);
     }
+
+    initAdmin();
 });
     </script>
 
