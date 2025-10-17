@@ -144,6 +144,9 @@
             // --- FUNÇÕES DA LOJA ---
 
             function renderProducts() {
+                // Sort products by position before rendering
+                allProducts.sort((a, b) => (a.position || 0) - (b.position || 0));
+
                 productGrid.innerHTML = '';
                 allProducts.forEach(product => {
                     const isOutOfStock = !product.inStock;
